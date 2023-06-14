@@ -1,81 +1,146 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import confetti from 'canvas-confetti'
 ---
 
-<Layout title="Welcome to Astro.">
-	<main>
-		<h1>Welcome to <span class="text-gradient">Astro</span></h1>
-		<p class="instructions">
-			To get started, open the directory <code>src/pages</code> in your project.<br />
-			<strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
-		</p>
-		<ul role="list" class="link-card-grid">
-			<Card
-				href="https://docs.astro.build/"
-				title="Documentation"
-				body="Learn how Astro works and explore the official API docs."
-			/>
-			<Card
-				href="https://astro.build/integrations/"
-				title="Integrations"
-				body="Supercharge your project with new frameworks and libraries."
-			/>
-			<Card
-				href="https://astro.build/themes/"
-				title="Themes"
-				body="Explore a galaxy of community-built starter themes."
-			/>
-			<Card
-				href="https://astro.build/chat/"
-				title="Community"
-				body="Come say hi to our amazing Discord community. ❤️"
-			/>
-		</ul>
+<Layout title="Newsletter sign up">
+	<main class="bg-[#36384e] min-h-screen">
+		<div id='newsletter-card'>
+			<div class="lg:h-screen lg:flex lg:justify-center lg:items-center lg:pt-20">
+				<div class=" bg-white max-w-2xl mx-auto rounded-3xl pb-5 lg:py-10  lg:max-w-4xl lg:px-8">
+					<div class="flex flex-col lg:flex-row-reverse ">
+						<picture>
+							<source media="(max-width: 1023px)" srcset="/assets/images/illustration-sign-up-mobile.svg">
+							<img class="w-full" src="/assets/images/illustration-sign-up-desktop.svg" alt="">
+						</picture>
+		
+						<div class="flex flex-col">
+							<div class="px-5  mt-10 lg:mt-20 text-[#36384e] flex flex-col">
+								<h1 class="font-black text-4xl lg:text-[55px] text-[#242742] mb-8">Stay updated!</h1>
+								<p>Join 60,000+ product managers receiving monthly updates on:</p>
+								<ul class="mt-5 [&>li>img]:inline flex flex-col [&>li]:flex [&>li]:items-start gap-3">
+									<li class="">
+										<img class="mr-2" src="/assets/images/icon-list.svg" alt="">
+										<span >Product discovery and building what matters</span>
+									</li>
+									<li>
+										<img class="mr-2" src="/assets/images/icon-list.svg" alt="">
+										Measuring to ensure updates are a success
+									</li>
+									<li>
+										<img class="mr-2" src="/assets/images/icon-list.svg" alt="">
+										And much more!
+									</li>
+								</ul>
+							</div>
+			
+							<form class="px-5 lg:px-5 lg:pr-16 mt-11">
+								<div class="flex flex-col gap-2">
+									<div class="flex flex-row justify-between">
+										<label for="email" class="text-xs font-black text-[#36384e]" for="">Email address</label>
+										<span id="invalidMsg" class="hidden text-[#ff6257] text-xs font-bold ">Valid email required</span>
+									</div>
+									<input class="hover:cursor-pointer border-2 py-4 px-5 rounded-md text-[#36384e] border-[#36384e]" id='email' type="email" placeholder="email@company.com">
+								</div>
+								<button class="bg-[#242742] shadow-lg hover:shadow-[#ff6257] hover:bg-[#ff6257] transition-colors text-white font-black rounded-lg w-full py-4 mt-5">
+									Subscribe to monthly newsletter
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+
+		<!-- success card -->
+		<div id="success-card" class="hidden ">
+			<div class="flex items-center justify-center h-screen">
+				<div class=" bg-white max-w-md lg:max-w-lg mx-auto flex flex-col h-screen lg:h-auto  justify-between lg:rounded-3xl px-6 lg:px-14 pt-36 pb-28 lg:pb-14 lg:pt-16 gap-14">
+	
+					<div class="flex flex-col">
+						<div>
+							<img src="/assets/images/icon-success.svg" alt="">
+						</div>
+		
+						<div class="text-[#36384e] mt-12 lg:mt-10 space-y-5" >
+							<h1 class="font-bold text-[40px] lg:text-5xl leading-10">Thanks for subscribing!</h1>
+							<p>A confirmation email has been sent to <span class="font-bold" id="emailContent">ash@loremcompany.com</span>. 
+								Please open it and click the button inside to confirm your subscription.
+							</p>
+						</div>
+					</div>
+		
+					<div class=" w-full">
+						<button id='dismissBtn' class="bg-[#242742] hover:bg-[#ff6257] shadow-lg hover:shadow-[#ff6257] transition-colors text-white font-black rounded-lg w-full py-4">
+							Dissmiss message
+						</button>
+					</div>
+					
+					</div>
+				</div>
+	</div>
 	</main>
 </Layout>
 
-<style>
-	main {
-		margin: auto;
-		padding: 1.5rem;
-		max-width: 60ch;
+<script>
+	const form = document.querySelector('form');
+	const emailInput = document.getElementById('email');
+	const invalidMsg = document.getElementById('invalidMsg');
+	const newsletterCard = document.getElementById('newsletter-card');
+	const successCard = document.getElementById('success-card');
+	const dismissBtn = document.getElementById('dismissBtn');
+	const emailContent = document.getElementById('emailContent');
+
+	const errorStyles = ['border-[#ff6257]', 'text-[#ff6257]', 'bg-[#ff6257]','bg-opacity-10'];
+
+	const validateEmail = (email) => {
+    	const emailPattern = new RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+    	return emailPattern.test(email);
 	}
-	h1 {
-		font-size: 3rem;
-		font-weight: 800;
-		margin: 0;
+
+	const invalidEmail = () =>{
+		emailInput.classList.remove('text-[#36384e]', 'border-[#36384e]')
+		emailInput.classList.add(...errorStyles)
+		invalidMsg.classList.remove('hidden')
 	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
+
+	const clearErrorMsg = () => {
+		emailInput.classList.remove(...errorStyles)
+		emailInput.classList.add('text-[#36384e]','border-[#36384e]')
+		invalidMsg.classList.add('hidden')
 	}
-	.instructions {
-		line-height: 1.6;
-		margin: 1rem 0;
-		border: 1px solid rgba(var(--accent), 25%);
-		background-color: white;
-		padding: 1rem;
-		border-radius: 0.4rem;
+
+	const successSignUp = () => {
+		emailContent.textContent = emailInput.value
+		emailInput.classList.remove(...errorStyles)
+		invalidMsg.classList.add('hidden')
+		newsletterCard.classList.add('hidden');
+		successCard.classList.remove('hidden')
+		emailInput.value = ''
+		confetti({
+  			particleCount: 100,
+  			spread: 70,
+  			origin: { y: 0.6 }
+			})
+
 	}
-	.instructions code {
-		font-size: 0.875em;
-		font-weight: bold;
-		background: rgba(var(--accent), 12%);
-		color: rgb(var(--accent));
-		border-radius: 4px;
-		padding: 0.3em 0.45em;
-	}
-	.instructions strong {
-		color: rgb(var(--accent));
-	}
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 1rem;
-		padding: 0;
-	}
-</style>
+
+	form.addEventListener('submit',(e)=> {
+		e.preventDefault();
+		const isValid = validateEmail(emailInput.value)
+		if(emailInput.value === '' || !isValid) {
+			invalidEmail()
+			return setTimeout(() => {
+				clearErrorMsg()
+			}, 5000);
+		}
+		return successSignUp()
+	})
+
+	dismissBtn.addEventListener('click', () => {
+		newsletterCard.classList.remove('hidden');
+		successCard.classList.add('hidden')
+	})
+
+</script>
